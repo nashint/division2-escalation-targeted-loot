@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Division 2 — Escalation Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--div-orange:#e8871a;--div-orange-bright:#ff9422;--div-teal:#4ef0d8;--div-surface:#111820;--div-surface2:#0d1219;--div-border:#1e2d3d;--div-border2:#2a3d52;--div-text:#c8d8e8;--div-text-dim:#5a7a90;--font-hud:'Barlow Condensed',sans-serif;--font-ui:'Rajdhani',sans-serif}
+html,body{min-height:100%;background:#0a0e14;font-family:var(--font-ui);color:var(--div-text)}
+.page{max-width:900px;margin:0 auto;padding:1.5rem 1rem 3rem}
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.25rem;flex-wrap:wrap;gap:8px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.topbar-titles h1{font-family:var(--font-hud);font-size:32px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;line-height:1;text-shadow:0 0 24px rgba(232,135,26,.35)}
+.topbar-titles p{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--div-text-dim);margin-top:2px}
+.topbar-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
+.weekly-pill{font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;background:var(--div-surface);border:1px solid var(--div-border2);border-radius:2px;padding:7px 14px;color:var(--div-text-dim)}
+.weekly-pill b{color:var(--div-orange)}
+.timer-block{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.timer-label{font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--div-text-dim)}
+.timer-val{font-family:var(--font-hud);font-size:38px;font-weight:800;color:var(--div-orange);font-variant-numeric:tabular-nums;letter-spacing:.04em;line-height:1;text-shadow:0 0 20px rgba(232,135,26,.6)}
+.tabs{display:flex;gap:2px;margin-bottom:1.25rem}
+.tab{font-family:var(--font-ui);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:8px 16px;cursor:pointer;border:1px solid var(--div-border);background:var(--div-surface);color:var(--div-text-dim);border-radius:2px;transition:all .15s}
+.tab:hover{border-color:var(--div-border2);color:var(--div-text)}
+.tab.on{background:var(--div-orange);border-color:var(--div-orange);color:#000}
+.mission-list{display:flex;flex-direction:column;gap:6px;margin-bottom:1rem}
+.mrow{background:var(--div-surface);border:1px solid var(--div-border);border-radius:3px;overflow:hidden;border-left:3px solid transparent}
+.mrow.stronghold-row{border-left-color:var(--div-teal)}
+.mrow.mission-row{border-left-color:#378ADD}
+.mrow-inner{display:flex;align-items:stretch;min-height:64px}
+.mrow-num{width:40px;display:flex;align-items:center;justify-content:center;font-family:var(--font-hud);font-size:20px;font-weight:800;flex-shrink:0;color:var(--div-text-dim);border-right:1px solid var(--div-border)}
+.mrow-icon{width:52px;display:flex;align-items:center;justify-content:center;flex-shrink:0;border-right:1px solid var(--div-border)}
+.mrow-info{flex:1;padding:.6rem .875rem;display:flex;flex-direction:column;justify-content:center;min-width:0;border-right:1px solid var(--div-border)}
+.mrow-name{font-family:var(--font-hud);font-size:16px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#fff;line-height:1;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow-badges{display:flex;align-items:center;gap:5px;flex-wrap:wrap}
+.badge-type{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:2px 6px;border-radius:2px;line-height:1.5}
+.badge-mission{background:rgba(55,138,221,.15);color:#7ab3d4;border:1px solid rgba(55,138,221,.25)}
+.badge-stronghold{background:rgba(78,240,216,.1);color:var(--div-teal);border:1px solid rgba(78,240,216,.2)}
+.badge-district{font-size:9px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--div-text-dim);padding:2px 6px;border:1px solid var(--div-border);border-radius:2px}
+.mrow-loot{flex:1.2;padding:.6rem 1rem;display:flex;flex-direction:column;justify-content:center;min-width:0}
+.mrow-loot-label{font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--div-text-dim);margin-bottom:3px}
+.mrow-loot-item{font-family:var(--font-hud);font-size:18px;font-weight:800;letter-spacing:.03em;text-transform:uppercase;color:var(--div-orange-bright);line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 0 12px rgba(232,135,26,.35)}
+.mrow-loot-footer{display:flex;align-items:center;justify-content:flex-end;margin-top:5px}
+.btn-edit-sm{font-family:var(--font-ui);font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--div-border2);background:transparent;color:var(--div-text-dim);border-radius:2px;padding:3px 8px;cursor:pointer;transition:all .12s}
+.btn-edit-sm:hover,.btn-edit-sm.active{border-color:var(--div-orange);color:var(--div-orange)}
+.edit-area{padding:.75rem 1rem;border-top:1px solid rgba(232,135,26,.25);background:var(--div-surface2)}
+.pw-overlay h4{font-family:var(--font-hud);font-size:14px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:.625rem}
+.pw-error{font-size:11px;color:#e04040;margin-top:4px;font-weight:600}
+.erow{display:flex;flex-direction:column;gap:3px;margin-bottom:.5rem}
+.erow label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--div-text-dim)}
+.erow input,.erow select{font-family:var(--font-ui);font-size:13px;font-weight:600;padding:6px 10px;border:1px solid var(--div-border2);border-radius:2px;background:#0a0f16;color:var(--div-text);width:100%;letter-spacing:.03em}
+.erow input:focus,.erow select:focus{outline:none;border-color:var(--div-orange)}
+.btn-row{display:flex;gap:8px}
+.bsave{font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:var(--div-orange);color:#000;border:none;border-radius:2px;padding:6px 16px;cursor:pointer}
+.bcancel{font-family:var(--font-ui);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:none;border:1px solid var(--div-border2);border-radius:2px;padding:6px 12px;cursor:pointer;color:var(--div-text-dim)}
+.tier-layout{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+@media(max-width:600px){.tier-layout{grid-template-columns:1fr}}
+.section-label{font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--div-text-dim);margin-bottom:.625rem;padding-bottom:.4rem;border-bottom:1px solid var(--div-border)}
+.tier-thead{display:grid;grid-template-columns:54px 90px 40px 1fr;padding:6px 10px;border-bottom:1px solid var(--div-border2)}
+.tier-thead span{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--div-text-dim)}
+.tier-rows{display:flex;flex-direction:column;background:var(--div-surface);border:1px solid var(--div-border);border-radius:3px;overflow:hidden}
+.tier-row{display:grid;grid-template-columns:54px 90px 40px 1fr;align-items:center;padding:8px 10px;border-bottom:1px solid var(--div-border);cursor:pointer;transition:background .12s;border-left:3px solid transparent}
+.tier-row:last-child{border-bottom:none}
+.tier-row:hover{background:var(--div-surface2)}
+.tier-row.selected{background:rgba(232,135,26,.1);border-left-color:var(--div-orange)}
+.tier-row.selected .tr-badge{color:var(--div-orange)!important;border-color:rgba(232,135,26,.4)!important;background:rgba(232,135,26,.15)!important}
+.tr-badge{display:inline-block;border-radius:2px;padding:2px 7px;font-size:11px;font-weight:700;letter-spacing:.06em;line-height:1.5}
+.t-free{background:rgba(58,191,94,.15);color:#3abf5e;border:1px solid rgba(58,191,94,.25)}
+.t-low{background:rgba(100,160,210,.12);color:#7ab3d4;border:1px solid rgba(100,160,210,.2)}
+.t-mid{background:rgba(232,135,26,.12);color:var(--div-orange);border:1px solid rgba(232,135,26,.22)}
+.t-hi{background:rgba(220,60,60,.12);color:#e04040;border:1px solid rgba(220,60,60,.22)}
+.tr-cost{font-size:12px;font-weight:600;color:var(--div-text)}
+.tr-net{font-size:13px;font-weight:700}
+.gn{color:#3abf5e}.rd{color:#e04040}
+.tr-drop-cell{display:flex;flex-direction:column;gap:1px}
+.tr-proto{font-size:12px;font-weight:700;color:var(--div-orange);line-height:1.3}
+.tr-loot{font-size:11px;font-weight:600;color:var(--div-text-dim);line-height:1.3}
+.tier-row.selected .tr-loot{color:var(--div-text)}
+.mut-panel{background:var(--div-surface);border:1px solid var(--div-border);border-radius:3px;padding:1rem}
+.mut-panel-title{font-family:var(--font-hud);font-size:16px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#fff;line-height:1}
+.mut-panel-sub{font-size:11px;color:var(--div-text-dim);font-weight:500;margin-top:3px;margin-bottom:.75rem}
+.click-hint{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--div-text-dim);text-align:center;padding:.6rem;border:1px dashed var(--div-border);border-radius:2px;margin-bottom:.75rem}
+.mut-section-hdr{font-family:var(--font-hud);font-size:13px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#fff;margin:8px 0 4px;padding-bottom:4px;border-bottom:1px solid var(--div-border)}
+.mut-list{display:flex;flex-direction:column;gap:3px}
+.mut-item{padding:.5rem .75rem;border-radius:2px;border:1px solid transparent;border-left:3px solid transparent;transition:all .2s}
+.mut-item.active{border-color:rgba(232,135,26,.2);border-left-color:var(--div-orange);background:rgba(232,135,26,.06)}
+.mut-item.inactive{opacity:.25}
+.mut-item-name{font-family:var(--font-hud);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;line-height:1;margin-bottom:3px}
+.mut-item.inactive .mut-item-name{color:var(--div-text-dim)}
+.mut-item-desc{font-size:11px;font-weight:500;color:var(--div-text-dim);line-height:1.5}
+.mut-item.active .mut-item-desc{color:var(--div-text)}
+.mut-item-tier{font-size:9px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--div-text-dim);margin-top:3px}
+.mut-item.active .mut-item-tier{color:var(--div-orange)}
+.note{font-size:11px;font-weight:500;letter-spacing:.05em;color:var(--div-text-dim);margin-top:.875rem;font-style:italic}
+</style>
+</head>
+<body>
+<div class="page" id="root"></div>
+<script>
+var ADMIN_PW='Hellonwheels9012';
+
+function strongholdSVG(sz,c){c=c||'#4ef0d8';return'<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 100 60" fill="'+c+'" xmlns="http://www.w3.org/2000/svg"><polygon points="8,28 22,28 22,18 15,10 8,18"/><rect x="10" y="20" width="10" height="5" fill="#0a0e14"/><rect x="8" y="30" width="14" height="22"/><line x1="8" y1="36" x2="22" y2="52" stroke="#0a0e14" stroke-width="2.5"/><line x1="22" y1="36" x2="8" y2="52" stroke="#0a0e14" stroke-width="2.5"/><rect x="8" y="52" width="14" height="3"/><polygon points="32,24 65,24 65,14 48,6 32,14"/><rect x="32" y="26" width="33" height="26"/><rect x="34" y="38" width="4" height="14" fill="#0a0e14"/><rect x="41" y="38" width="4" height="14" fill="#0a0e14"/><rect x="48" y="38" width="4" height="14" fill="#0a0e14"/><rect x="55" y="38" width="4" height="14" fill="#0a0e14"/><rect x="65" y="32" width="18" height="20"/><polygon points="65,32 83,32 74,24"/></svg>';}
+function hexSVG(sz,c){c=c||'rgba(55,138,221,0.8)';return'<svg width="'+sz+'" height="'+sz+'" viewBox="0 0 24 24" fill="none"><path d="M12 2L21 7V17L12 22L3 17V7Z" stroke="'+c+'" stroke-width="1.6"/><path d="M12 6L17.5 9V15L12 18L6.5 15V9Z" stroke="'+c+'" stroke-width="1" opacity="0.45"/></svg>';}
+
+var ALL_LOCS=[{name:'The Art Museum',type:'mission',district:'West End'},{name:'Manning National Zoo',type:'stronghold',district:'Northeast'},{name:'Camp White Oak',type:'mission',district:'Camp White Oak'},{name:'The Pentagon',type:'stronghold',district:'Pentagon'},{name:'DARPA Research Labs',type:'mission',district:'Southwest'},{name:'Potomac Event Center',type:'mission',district:'Upper Northwest'},{name:'Grand Washington Hotel',type:'mission',district:'West End'},{name:'Jefferson Trade Center',type:'mission',district:'Constitution Hall'},{name:'Bank Headquarters',type:'mission',district:'Downtown West'},{name:'ViewPoint Museum',type:'mission',district:'Downtown East'},{name:'American History Museum',type:'mission',district:'Federal Triangle'},{name:'DCD Headquarters',type:'mission',district:'Penn Quarter'},{name:'Lincoln Memorial',type:'mission',district:'West Potomac Park'},{name:'Air & Space Museum',type:'mission',district:'East Mall'},{name:'Federal Emergency Bunker',type:'mission',district:'Southwest'},{name:'Space Administration HQ',type:'mission',district:'Downtown West'},{name:'Jefferson Plaza',type:'mission',district:'Northeast'},{name:'Roosevelt Island',type:'stronghold',district:'Roosevelt Island'},{name:'District Union Arena',type:'stronghold',district:'Downtown East'},{name:'Capitol Building',type:'stronghold',district:'Capitol Hill'},{name:'Tidal Basin',type:'stronghold',district:'Tidal Basin'}];
+
+var TIERS=[{lb:'Free',cost:0,prof:2,drop:0,tgt:0,cls:'t-free',mut:[]},{lb:'T-1',cost:1,prof:3,drop:0.2,tgt:5,cls:'t-low',mut:['Harvester']},{lb:'T-2',cost:3,prof:6,drop:0.4,tgt:11,cls:'t-low',mut:['Harvester','Unyielding']},{lb:'T-3',cost:7,prof:10,drop:0.6,tgt:16,cls:'t-low',mut:['Harvester','Unyielding','Suppressor']},{lb:'T-4',cost:12,prof:16,drop:0.6,tgt:22,cls:'t-mid',mut:['Harvester','Unyielding','Suppressor']},{lb:'T-5',cost:20,prof:24,drop:0.8,tgt:28,cls:'t-mid',mut:['Harvester','Unyielding','Suppressor','Anchor']},{lb:'T-6',cost:29,prof:34,drop:1.25,tgt:39,cls:'t-mid',mut:['Harvester','Unyielding','Suppressor','Anchor','Hot Foot']},{lb:'T-7',cost:41,prof:46,drop:1.5,tgt:45,cls:'t-hi',mut:['Harvester','Unyielding','Suppressor','Anchor','Hot Foot','Aid Specialist']},{lb:'T-8',cost:54,prof:60,drop:2.0,tgt:50,cls:'t-hi',mut:['Harvester','Unyielding','Suppressor','Anchor','Hot Foot','Aid Specialist']},{lb:'T-9',cost:70,prof:76,drop:2.5,tgt:56,cls:'t-hi',mut:['Harvester','Unyielding','Suppressor','Anchor','Hot Foot','Aid Specialist']},{lb:'T-10',cost:87,prof:94,drop:3.0,tgt:62,cls:'t-hi',mut:['Harvester','Unyielding','Suppressor','Anchor','Hot Foot','Aid Specialist']}];
+
+var MUTATORS=[{n:'Harvester',d:'When dealing damage, this enemy regenerates Armor and Health by a percentage of your maximum Armor. Can overheal.',starts:'T-1+',global:false},{n:'Unyielding',d:'All enemies become immune to crowd control effects while significantly damaged.',starts:'T-2+',global:true},{n:'Suppressor',d:'When damaged, this enemy starts to charge an EMP blast. When fully charged, he unleashes it, disrupting everything in the area.',starts:'T-3+',global:false},{n:'Anchor',d:'This enemy has damage resistance and fires incendiary ammo as long as he has any allies around him.',starts:'T-5+',global:false},{n:'Hot Foot',d:'If you stay in the same spot for too long, a charge counter begins to fill. When it reaches maximum, you are Shocked and take damage.',starts:'T-6+',global:true},{n:'Aid Specialist',d:'This enemy periodically Repairs the Armor of all allies around him, if they are badly damaged.',starts:'T-7+',global:false}];
+
+var DEFAULT=[{name:'The Art Museum',dailyLoot:'Alps Summit Armament'},{name:'Manning National Zoo',dailyLoot:'Chameleon'},{name:'Camp White Oak',dailyLoot:'Merciless'},{name:'The Pentagon',dailyLoot:'Liberty'},{name:'DARPA Research Labs',dailyLoot:'Dodge City Holster'}];
+var missions=(function(){try{var s=localStorage.getItem('div2_tracker');return s?JSON.parse(s):null;}catch(e){return null;}})()||DEFAULT.map(function(m){return{name:m.name,dailyLoot:m.dailyLoot};});
+var editing=null,awaitingPw=null,pwError=false,tab='missions',selectedTier=null,isAdmin=false;
+function save(){try{localStorage.setItem('div2_tracker',JSON.stringify(missions));}catch(e){}}
+
+function getChicagoOffset(d){var utc=d.getTime();var chi=new Date(d.toLocaleString('en-US',{timeZone:'America/Chicago'})).getTime();return utc-chi;}
+function getNext3amChicago(){var now=new Date();var off=getChicagoOffset(now);var chiNow=new Date(now.getTime()-off);var reset=new Date(chiNow);reset.setHours(3,0,0,0);if(chiNow>=reset)reset.setDate(reset.getDate()+1);return new Date(reset.getTime()+getChicagoOffset(reset));}
+function getNextTuesday3amChicago(){var now=new Date();var off=getChicagoOffset(now);var chiNow=new Date(now.getTime()-off);var day=chiNow.getDay();var dtu=(2-day+7)%7;var reset=new Date(chiNow);reset.setDate(chiNow.getDate()+dtu);reset.setHours(3,0,0,0);if(dtu===0&&chiNow>=reset)reset.setDate(reset.getDate()+7);return new Date(reset.getTime()+getChicagoOffset(reset));}
+function fmtHMS(ms){if(ms<=0)return'00:00:00';var h=Math.floor(ms/3600000),m=Math.floor((ms%3600000)/60000),s=Math.floor((ms%60000)/1000);return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');}
+function fmtWeekly(ms){var d=Math.floor(ms/86400000),h=Math.floor((ms%86400000)/3600000);return d>0?d+'d '+h+'h':h+'h';}
+
+function render(){
+  var now=new Date(),dailyMs=getNext3amChicago()-now,weeklyMs=getNextTuesday3amChicago()-now;
+  var h='<div class="topbar"><div class="topbar-left">'+strongholdSVG(38,'#e8871a')+'<div class="topbar-titles"><h1>ESCALATION</h1><p>Y8S1 Rise Up &nbsp;&middot;&nbsp; Cherry Blossom Event</p></div></div>';
+  h+='<div class="topbar-right"><div class="weekly-pill">Weekly reset &nbsp;<b>'+fmtWeekly(weeklyMs)+'</b></div><div class="timer-block"><div class="timer-label">Daily Loot Resets</div><div class="timer-val" id="dtimer">'+fmtHMS(dailyMs)+'</div></div></div></div>';
+  h+='<div class="tabs"><button class="tab'+(tab==='missions'?' on':'')+'" onclick="setTab(\'missions\')">Active Missions</button><button class="tab'+(tab==='tiers'?' on':'')+'" onclick="setTab(\'tiers\')">Tiers &amp; Mutators</button></div>';
+
+  if(tab==='missions'){
+    h+='<div class="mission-list">';
+    missions.forEach(function(m,i){
+      var loc=ALL_LOCS.find(function(l){return l.name===m.name;})||{type:'mission',district:'Unknown'};
+      var isSH=loc.type==='stronghold',isEdit=editing===i,isPw=awaitingPw===i;
+      h+='<div class="mrow '+(isSH?'stronghold-row':'mission-row')+'"><div class="mrow-inner">';
+      h+='<div class="mrow-num">'+(i+1)+'</div>';
+      h+='<div class="mrow-icon">'+(isSH?strongholdSVG(36,'#4ef0d8'):hexSVG(26,'rgba(55,138,221,0.85)'))+'</div>';
+      h+='<div class="mrow-info"><div class="mrow-name">'+m.name+'</div><div class="mrow-badges"><span class="badge-type '+(isSH?'badge-stronghold':'badge-mission')+'">'+(isSH?'Stronghold':'Mission')+'</span><span class="badge-district">'+loc.district+'</span></div></div>';
+      h+='<div class="mrow-loot"><div class="mrow-loot-label">Today\'s Targeted Loot</div><div class="mrow-loot-item">'+(m.dailyLoot||'&mdash;')+'</div><div class="mrow-loot-footer"><button class="btn-edit-sm'+(isEdit||isPw?' active':'')+'" onclick="tryEdit('+i+')">'+(isEdit?'&#x2715; Close':isPw?'&#x1F512; Unlock':'&#x1F512; Edit')+'</button></div></div>';
+      h+='</div>';
+      if(isPw){h+='<div class="edit-area"><div class="pw-overlay"><h4>Admin Access Required</h4><div class="erow"><label>Password</label><input type="password" id="pw'+i+'" placeholder="Enter password" onkeydown="if(event.key===\'Enter\')checkPw('+i+')" />'+(pwError?'<div class="pw-error">Incorrect password &mdash; try again</div>':'')+'</div><div class="btn-row"><button class="bsave" onclick="checkPw('+i+')">Unlock</button><button class="bcancel" onclick="cancelEdit()">Cancel</button></div></div></div>';}
+      if(isEdit){var opts=ALL_LOCS.map(function(l){return'<option value="'+l.name+'"'+(l.name===m.name?' selected':'')+'>'+l.name+' ('+(l.type==='stronghold'?'Stronghold':'Mission')+')</option>';}).join('');h+='<div class="edit-area"><div class="erow"><label>Mission / Stronghold</label><select id="en'+i+'">'+opts+'</select></div><div class="erow"><label>Today\'s Daily Targeted Loot</label><input id="edaily'+i+'" value="'+(m.dailyLoot||'')+'" placeholder="Item name"/></div><div class="btn-row"><button class="bsave" onclick="saveEdit('+i+')">Save</button><button class="bcancel" onclick="cancelEdit()">Cancel</button></div></div>';}
+      h+='</div>';
+    });
+    h+='</div><p class="note">Update daily loot each morning at 3:00 AM CST &nbsp;&middot;&nbsp; Update missions each Tuesday on weekly reset</p>';
+  }
+
+  if(tab==='tiers'){
+    var sT=selectedTier!==null?TIERS[selectedTier]:null,aM=sT?sT.mut:[],eM=MUTATORS.filter(function(m){return!m.global;}),gM=MUTATORS.filter(function(m){return m.global;});
+    h+='<div class="tier-layout"><div><div class="section-label">Select a Tier</div><div class="tier-thead"><span>Tier</span><span>Cost</span><span>Net</span><span>Drops</span></div><div class="tier-rows">';
+    TIERS.forEach(function(t,i){var net=t.prof-t.cost,isSel=selectedTier===i,cs=t.cost===0?'<span style="color:#3abf5e;font-weight:700">Free</span>':t.cost+' tokens';h+='<div class="tier-row'+(isSel?' selected':'')+'" onclick="selectTier('+i+')"><span><span class="tr-badge '+t.cls+'">'+t.lb+'</span></span><span class="tr-cost">'+cs+'</span><span class="tr-net '+(net>=0?'gn':'rd')+'">'+(net>=0?'+':'')+net+'</span><span class="tr-drop-cell">'+(t.drop>0?'<span class="tr-proto">'+t.drop.toFixed(1)+'% Prototype</span><span class="tr-loot">'+t.tgt+'% Targeted Loot</span>':'<span style="color:#5a7a90;font-size:11px">&mdash;</span>')+'</span></div>';});
+    h+='</div></div><div><div class="section-label">Active Mutators</div><div class="mut-panel">';
+    if(selectedTier===null){h+='<div class="click-hint">&larr; Select a tier to see active mutators</div><div class="mut-section-hdr">Enemy Mutators</div><div class="mut-list">';eM.forEach(function(mu){h+='<div class="mut-item inactive"><div class="mut-item-name">'+mu.n+'</div><div class="mut-item-desc">'+mu.d+'</div><div class="mut-item-tier">'+mu.starts+'</div></div>';});h+='</div><div class="mut-section-hdr">Global Mutators</div><div class="mut-list">';gM.forEach(function(mu){h+='<div class="mut-item inactive"><div class="mut-item-name">'+mu.n+'</div><div class="mut-item-desc">'+mu.d+'</div><div class="mut-item-tier">'+mu.starts+'</div></div>';});h+='</div>';}
+    else{h+='<div class="mut-panel-title">'+(sT.lb==='Free'?'Free Tier':sT.lb)+' &mdash; '+aM.length+' Active</div><div class="mut-panel-sub">'+(aM.length===0?'No mutators at this tier':'Highlighted mutators are live this run')+'</div><div class="mut-section-hdr">Enemy Mutators</div><div class="mut-list">';eM.forEach(function(mu){var a=aM.indexOf(mu.n)!==-1;h+='<div class="mut-item '+(a?'active':'inactive')+'"><div class="mut-item-name">'+mu.n+'</div><div class="mut-item-desc">'+mu.d+'</div><div class="mut-item-tier">'+mu.starts+'</div></div>';});h+='</div><div class="mut-section-hdr">Global Mutators</div><div class="mut-list">';gM.forEach(function(mu){var a=aM.indexOf(mu.n)!==-1;h+='<div class="mut-item '+(a?'active':'inactive')+'"><div class="mut-item-name">'+mu.n+'</div><div class="mut-item-desc">'+mu.d+'</div><div class="mut-item-tier">'+mu.starts+'</div></div>';});h+='</div>';}
+    h+='</div></div></div><p class="note">Prototype % = per-enemy drop chance &nbsp;&middot;&nbsp; Targeted Loot % = loot allocation increase per tier</p>';
+  }
+
+  document.getElementById('root').innerHTML=h;
+  startTimer();
+}
+
+var timerRef=null;
+function startTimer(){if(timerRef)clearInterval(timerRef);timerRef=setInterval(function(){var el=document.getElementById('dtimer');if(!el){clearInterval(timerRef);return;}el.textContent=fmtHMS(Math.max(0,getNext3amChicago()-new Date()));},1000);}
+function setTab(t){tab=t;editing=null;awaitingPw=null;pwError=false;render();}
+function selectTier(i){selectedTier=selectedTier===i?null:i;render();}
+function tryEdit(i){if(editing===i){cancelEdit();return;}if(isAdmin){editing=i;awaitingPw=null;pwError=false;render();setTimeout(function(){var el=document.getElementById('en'+i);if(el)el.focus();},50);return;}awaitingPw=awaitingPw===i?null:i;editing=null;pwError=false;render();setTimeout(function(){var el=document.getElementById('pw'+i);if(el)el.focus();},50);}
+function checkPw(i){var v=((document.getElementById('pw'+i)||{}).value||'').trim();if(v===ADMIN_PW){isAdmin=true;awaitingPw=null;editing=i;pwError=false;render();setTimeout(function(){var el=document.getElementById('en'+i);if(el)el.focus();},50);}else{pwError=true;render();setTimeout(function(){var el=document.getElementById('pw'+i);if(el)el.focus();},50);}}
+function cancelEdit(){editing=null;awaitingPw=null;pwError=false;render();}
+function saveEdit(i){var n=((document.getElementById('en'+i)||{}).value||'').trim(),dl=((document.getElementById('edaily'+i)||{}).value||'').trim();if(n)missions[i]={name:n,dailyLoot:dl||'—'};save();editing=null;render();}
+render();
+</script>
+</body>
+</html>
